@@ -17,13 +17,12 @@ class Control():
         #self.sprites = [[pygame.image.load("/..sprites.convert_alpha() for i in range(1,9)]
         self.players = [0 for i in range (nplayers)]
         self.cria_player(nplayers,borda)
-        self.som = [ pygame.mixer.Sound("sounds/som" + str(i) +".wav") for i in range(3) ]
+        self.som = [ pygame.mixer.Sound("sounds/som" + str(i) +".wav") for i in range(4) ]
 
         self.actionsound = pygame.mixer.Sound("sounds/action.ogg")
         self.start = 0
 
 
-    
 
     def cria_player(self,nplayer, borda):
         for i in range(nplayer):
@@ -111,13 +110,11 @@ class Control():
                         if self.matriz[x+i][y+j] != actualcolor:
                             adjcolor[index] = self.matriz[x+i][y+j]
                     index += 1
-        print("Pedro!")
-        print(adjcolor)
         return adjcolor
 
     def checkGreenAdjacentsColors(self, vizg):
         for i in range(4):
-            if vizg[i] and vizg[8-i] and tuple(map(operator.add, vizg[i], vizg[8-i])) == (255,0,255):
+            if vizg[i] and vizg[7-i] and tuple(map(operator.add, vizg[i], vizg[7-i])) == (255,0,255):
                  self.players[self.atual].pontos += 1
 
     def checkOtherAdjacentsColors(self, actualcolor, adj):
@@ -127,36 +124,28 @@ class Control():
             #red test
             if (actualcolor == (255,0,0)):
                 if (adj[i] and adj[i+3] and adj[i][2]+adj[i+3][1] == 510):
-                    print ("aqui1")
                     self.players[self.atual].pontos += 1
                 if (adj[i+10] and adj[i+13] and adj[i+10][1]+adj[i+13][2] == 510):
-                    print ("aqui2")
                     self.players[self.atual].pontos += 1
             #blue test
             else:
                 if (adj[i] and adj[i+3] and adj[i][0]+adj[i+3][1] == 510):
-                    print ("aqui3")
                     self.players[self.atual].pontos += 1
                 if (adj[i+10] and adj[i+13] and adj[i+10][1] + adj[i+13][0] == 510):
-                    print ("aqui4")
                     self.players[self.atual].pontos += 1
 
         #checking vertical and horizontal
         #red check
         if (actualcolor == (255,0,0)):
             if (adj[6] and adj[7] and adj[6][2] + adj[7][1] == 510):
-                print ("geba2")
                 self.players[self.atual].pontos += 1
             if (adj[8] and adj[9] and adj[8][1] +  adj[9][2] == 510):
-                print ("geba3")
                 self.players[self.atual].pontos += 1
         #blue check
         else:
             if (adj[6] and adj[7] and adj[6][0] + adj[7][1] == 510):
-                print ("geba1")
                 self.players[self.atual].pontos += 1
             if (adj[8] and adj[9] and adj[8][1] + adj[9][0] == 510):
-                print ("geba2")
                 self.players[self.atual].pontos += 1
 
 
@@ -179,4 +168,4 @@ class Control():
         pts -= self.players[self.atual].pontos
         pts = abs(pts)
         if (pts>0):
-            self.som[pts-1].play()
+            self.som[pts].play()

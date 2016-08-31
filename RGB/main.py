@@ -14,7 +14,7 @@ def main():
     pygame.display.set_caption("RGB")
     pygame.mixer.music.load('songs/Universal.ogg')
     pygame.mixer.music.set_volume(.5)
-    #pygame.mixer.music.play(-1)
+    pygame.mixer.music.play(-1)
     #criar um contador de tempo
     timer = pygame.time.Clock()
     FPS = 15
