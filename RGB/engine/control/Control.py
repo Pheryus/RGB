@@ -18,8 +18,12 @@ class Control():
         self.players = [0 for i in range (nplayers)]
         self.cria_player(nplayers,borda)
         self.som = [ pygame.mixer.Sound("sounds/som" + str(i) +".wav") for i in range(3) ]
+
         self.actionsound = pygame.mixer.Sound("sounds/action.ogg")
         self.start = 0
+
+
+    
 
     def cria_player(self,nplayer, borda):
         for i in range(nplayer):
@@ -75,7 +79,7 @@ class Control():
             if not self.matriz[x][y]:
                 self.matriz[x][y] = self.players[i].cor
                 self.players[i].cor = mudacor
-                self.testa_pontos(x,y)
+                self.checkPoints(x,y)
                 if self.atual == nplayer-1:
                     self.atual = 0
                 else:
@@ -85,10 +89,10 @@ class Control():
         for i in range(window.tam):
             for j in range(window.tam):
                 if (not self.matriz[j][i]):
-                    aux = (255,255,255)
+                    actualcolor = (255,255,255)
                 else:
-                    aux = self.matriz[j][i]
-                pygame.draw.rect(window.tela,aux, (window.qd*i + window.bx,window.qd*j + window.by, window.qd,window.qd),0)
+                    actualcolor = self.matriz[j][i]
+                pygame.draw.rect(window.tela,actualcolor, (window.qd*i + window.bx,window.qd*j + window.by, window.qd,window.qd),0)
                 pygame.draw.rect(window.tela,(0,0,0), (window.qd*i + window.bx,window.qd*j + window.by, window.qd,window.qd),1)
 
 
@@ -96,66 +100,83 @@ class Control():
         pygame.draw.rect(borda.tela,self.players[0].cor,((int)(borda.bx / 4), borda.by + 180, borda.qd,borda.qd),0)
         pygame.draw.rect(borda.tela,self.players[1].cor,((int)(borda.width - 3*borda.bx/4), borda.by + 180, borda.qd,borda.qd),0)
 
-    def testa_pontos(self,x,y):
-        pts = self.players[self.atual].pontos
-        aux = self.matriz[x][y]
-        vizo = [None for i in range(25)]
-        vizg = [None for i in range(16)]
-        v1 = 0
-        #se for verde
-        if aux == (0,255,0):
-            for i in range (-1,2):
-                for j in range(-1,2):
-                    if x+i >= 0 and x+i < self.tam and y+j >= 0 and y+j < self.tam and self.matriz[x+i][y+j] != aux:
-                        vizg[v1] = self.matriz[x+i][y+j]
-                    v1 += 1
-            for i in range(4):
-                if vizg[i] and vizg[8-i] and tuple(map(operator.add, vizg[i], vizg[8-i])) == (255,0,255):
-                     self.players[self.atual].pontos += 1
-        #azul ou vermelho
-        else:
-            for i in range(-2,3):
-                for j in range(-2,3):
-                    if abs(i)+abs(j) not in (0,3):
-                        if x+i >= 0 and x+i < self.tam and y+j >= 0 and y+j < self.tam:
-                            vizo[v1] = self.matriz[x+i][y+j]
-                        v1 += 1
-            print (vizo)
-            for i in range(3):
-                #se for vermelho
-                print (i)
-                if (aux == (255,0,0)):
-                    if (vizo[i] and vizo[i+3] and vizo[i][1]+vizo[i+3][2] == 510):
-                        print ("aqui1")
-                        self.players[self.atual].pontos += 1
-                    if (vizo[i+10] and vizo[i+13] and vizo[i+10][1]+vizo[i+13][2] == 510):
-                        print ("aqui2")
-                        self.players[self.atual].pontos += 1
-                else:
-                    if (vizo[i] and vizo[i+3] and vizo[i][0]+vizo[i+3][1] == 510):
-                        print ("aqui3")
-                        self.players[self.atual].pontos += 1
-                    if (vizo[i+10] and vizo[i+13] and vizo[i+10][1] + vizo[i+13][0] == 510):
-                        print ("aqui4")
-                        self.players[self.atual].pontos += 1
+    def getAdjacentsColors(self,adjsize, actualcolor,x,y):
+        index = 0
+        adjcolor = [None for i in range(25)]
+        for i in range (adjsize[0],adjsize[1]):
+            for j in range(adjsize[0],adjsize[1]):
+                #TEST IF IT'S OUTSIDE THE SCREEN
+                if abs(i)+abs(j) not in (0,3):
+                    if x+i >= 0 and x+i < self.tam and y+j >= 0 and y+j < self.tam:
+                        if self.matriz[x+i][y+j] != actualcolor:
+                            adjcolor[index] = self.matriz[x+i][y+j]
+                    index += 1
+        print("Pedro!")
+        print(adjcolor)
+        return adjcolor
 
-            if (aux == (255,0,0)):
-                if (vizo[6] and vizo[7] and vizo[6][2] + vizo[7][1] == 510):
-                    print ("geba2")
+    def checkGreenAdjacentsColors(self, vizg):
+        for i in range(4):
+            if vizg[i] and vizg[8-i] and tuple(map(operator.add, vizg[i], vizg[8-i])) == (255,0,255):
+                 self.players[self.atual].pontos += 1
+
+    def checkOtherAdjacentsColors(self, actualcolor, adj):
+
+        #checking diagonals
+        for i in range(3):
+            #red test
+            if (actualcolor == (255,0,0)):
+                if (adj[i] and adj[i+3] and adj[i][2]+adj[i+3][1] == 510):
+                    print ("aqui1")
                     self.players[self.atual].pontos += 1
-                if (vizo[8] and vizo[9] and vizo[8][1] +  vizo[9][2] == 510):
-                    print ("geba3")
+                if (adj[i+10] and adj[i+13] and adj[i+10][1]+adj[i+13][2] == 510):
+                    print ("aqui2")
                     self.players[self.atual].pontos += 1
-            #se for azul
+            #blue test
             else:
-                if (vizo[6] and vizo[7] and vizo[6][0] + vizo[7][1] == 510):
-                    print ("geba1")
+                if (adj[i] and adj[i+3] and adj[i][0]+adj[i+3][1] == 510):
+                    print ("aqui3")
                     self.players[self.atual].pontos += 1
-                if (vizo[8] and vizo[9] and vizo[8][1] + vizo[9][0] == 510):
-                    print ("geba2")
+                if (adj[i+10] and adj[i+13] and adj[i+10][1] + adj[i+13][0] == 510):
+                    print ("aqui4")
                     self.players[self.atual].pontos += 1
-        v1 = 0
+
+        #checking vertical and horizontal
+        #red check
+        if (actualcolor == (255,0,0)):
+            if (adj[6] and adj[7] and adj[6][2] + adj[7][1] == 510):
+                print ("geba2")
+                self.players[self.atual].pontos += 1
+            if (adj[8] and adj[9] and adj[8][1] +  adj[9][2] == 510):
+                print ("geba3")
+                self.players[self.atual].pontos += 1
+        #blue check
+        else:
+            if (adj[6] and adj[7] and adj[6][0] + adj[7][1] == 510):
+                print ("geba1")
+                self.players[self.atual].pontos += 1
+            if (adj[8] and adj[9] and adj[8][1] + adj[9][0] == 510):
+                print ("geba2")
+                self.players[self.atual].pontos += 1
+
+
+    def checkPoints(self,x,y):
+        pts = self.players[self.atual].pontos
+        actualcolor = self.matriz[x][y]
+        neightborhood = [ (-1,2), (-2,3)]
+        #if it's green
+        if actualcolor == (0,255,0):
+            self.checkGreenAdjacentsColors(self.getAdjacentsColors(neightborhood[0], actualcolor,x,y))
+
+        #red or green
+        else:
+            self.checkOtherAdjacentsColors(actualcolor, (self.getAdjacentsColors(neightborhood[1], actualcolor,x,y)))
+
+        self.getPoints(pts)
+
+
+    def getPoints(self, pts):
         pts -= self.players[self.atual].pontos
         pts = abs(pts)
         if (pts>0):
-            self.som[pts].play()
+            self.som[pts-1].play()

@@ -14,7 +14,7 @@ def main():
     pygame.display.set_caption("RGB")
     pygame.mixer.music.load('songs/Universal.ogg')
     pygame.mixer.music.set_volume(.5)
-    pygame.mixer.music.play(-1)
+    #pygame.mixer.music.play(-1)
     #criar um contador de tempo
     timer = pygame.time.Clock()
     FPS = 15
@@ -31,13 +31,20 @@ def main():
     jogo = 1
     loop_control = LoopControl(FPS,window,timer)
     #inicializa menu
-    menu = Menu(fonte, loop_control)
+    menu = Menu(fonte, loop_control,window)
     pygame.time.wait(300)
     while jogo:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                jogo = False
         loop_control.limpa_testa()
         fonte.atualiza_fonts(controle,nplayers)
         controle.loop_control(nplayers,timer, window)
         loop_control.loop()
+
+
+    pygame.quit()
+    sys.exit()
 
 
 if __name__ == "__main__":
