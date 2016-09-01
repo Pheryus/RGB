@@ -21,6 +21,7 @@ class Control():
 
         self.actionsound = pygame.mixer.Sound("sounds/action.ogg")
         self.start = 0
+        self.turns = 0
 
 
 
@@ -42,6 +43,19 @@ class Control():
         self.desenha_cor_personagem(nplayers,window)
         self.desenha_tela_borda(window)
         self.desenha_players(window,nplayers)
+
+
+    def end_game(self):
+        if (self.turns == 81):
+            if self.players[0] == self.players[1]:
+                print("EMPATE")
+            elif self.players[0] >= self.players[0]:
+                print("PLAYER 1 GANHOU!")
+            else:
+                print("PLAYER 2 GANHOU!")
+            return False
+        return True
+
 
     def move_players(self,borda, nplayers,time):
 
@@ -74,6 +88,7 @@ class Control():
         x = self.players[i].posicao[0]
         y = self.players[i].posicao[1]
         if (pygame.key.get_pressed()[pygame.K_RETURN] and self.atual == 0 ) or (pygame.key.get_pressed()[pygame.K_SPACE] and self.atual == 1):
+            self.turns += 1
             self.actionsound.play()
             if not self.matriz[x][y]:
                 self.matriz[x][y] = self.players[i].cor

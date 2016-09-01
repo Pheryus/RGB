@@ -24,7 +24,6 @@ class Fonts():
 
     def sizeWord(self,word,chsize):
         value = (len(word)*(chsize/2) + chsize) * (1360/self.window.width)
-        print(value)
         return value
 
     def atualiza_pontos(self,controle):

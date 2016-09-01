@@ -41,6 +41,7 @@ def main():
         fonte.atualiza_fonts(controle,nplayers)
         controle.loop_control(nplayers,timer, window)
         loop_control.loop()
+        jogo = controle.end_game()
 
 
     pygame.quit()
